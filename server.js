@@ -1,44 +1,49 @@
-const http = require('http');
-const mime = require('mime');
-const fs = require('fs');
-const path = require('path');
+const net = require('net');
+const events = require('events');
 
-function sendError(err, response) {
-    console.log(err);
-    response.writeHead(err, {"Content-Type": 'text/plain'});
-    response.write(err.toString() + '. Resource not found!');
-    response.end();
-}
+var channel = new events.EventEmitter();
+channel.clients = {};
+channel.subscribtions = {};
 
-const server = http.createServer(function (request, response) {
-    getTitles(response);
+
+channel.on('join', function (id, client) {
+    this.clients[id] = client;
+    this.subscribtions[id] = function (senderId, message) {
+        if (id !== senderId) {
+            this.clients[id].write(message);
+        }
+    };
+
+    this.on('broadcast', this.subscribtions[id]);
 });
 
-function getTitles(response) {
-    const filename = './resources/titles.json';
-    fs.readFile(filename, function (err, data) {
-        if (err) return sendError(404, response);
+// channel.on('broadcast', function (message) {
+//     for (var client in this.clients) {
+//         console.log('client' + client.toString());
+//     }
+// });
 
-        getTemplate(JSON.parse(data.toString()), response);
-    });
-}
+channel.on('leave', function (id) {
+    channel.removeListener('broadcast', this.subscribtions[id]);
 
-function getTemplate(titles, response) {
-    const filename = './public/template.html';
-    fs.readFile(filename, function (err, data) {
-        if (err) return sendError(404, response);
-
-        formatHtml(titles, data.toString(), response);
-    });
-}
-
-function formatHtml(titles, template, response) {
-    const html = template.replace('%', titles.join('</li><li>'));
-    response.writeHead(200, {'Content-Type': 'text/html'});
-    response.end(html);
-}
-
-const port = 3000;
-server.listen(port, function () {
-    console.log('Server running at ' + port + '.');
+    channel.emit('broadcast', id, id + " has left the chat.\n");
 });
+
+const server = net.createServer(function (client) {
+    const id = client.remoteAddress + ':' + client.remotePort;
+    channel.emit('join', id, client);
+
+    client.on('data', function(data) {
+        data = data.toString();
+        if (data === 'end\r\n') {
+            client.end();
+        }
+        channel.emit('broadcast', id, data);
+    });
+
+    client.on('close', function () {
+        channel.emit('leave', id);
+    });
+});
+
+server.listen(8888);
