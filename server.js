@@ -1,34 +1,21 @@
-const flow = require('nimble');
-const exec = require('child_process').exec;
+const http = require('http');
 
-function downloadNodeVersion(version, destination, callback) {
-    const url = 'http://nodejs.org/dist/node-v' + version + '.tag.gz';
-    const filepath = destination + '/' + version + '.tgz';
-    exec('curl ' + url + '>' + filepath, callback);
-}
+const server = http.createServer(function (req, res) {
+    // const body = 'Hello, World!';
+    //
+    // res.setHeader('Content-Length', body.length);
+    // res.setHeader('Content-Type', 'text/plain');
+    // res.end(body);
 
-flow.series([
-    function (callback) {
-        flow.parallel([
-            function (callback) {
-                console.log('Downloading Node v0.4.6...');
-                downloadNodeVersion('0.4.6', '/tmp', callback);
-            },
-            function (callback) {
-                console.log('Downloading Node v0.4.7...');
-                downloadNodeVersion('0.4.7', '/tmp', callback);
-            }
-        ], callback);
-    },
-    function (callback) {
-        console.log('Creating archive of downloaded files...');
+    const url = 'http://google.com';
+    const body = '<p>Redirecting to <a href="' + url + '">'
+        + url + '</a></p>';
 
-        exec(
-            'tar cvf node_distros.tar /tmp/0.4.6.tgz /tmp/0.4.7.tgz',
-            function (err, stdout, stderr) {
-                console.log('All Done!');
-                callback();
-            }
-        );
-    }
-]);
+    res.setHeader('Location', url);
+    res.setHeader('Content-Length', body.length);
+    res.setHeader('Content-Type', 'text/html');
+    res.statusCode = 302;
+    res.end(body);
+});
+
+server.listen(3000);
