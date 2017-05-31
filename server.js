@@ -1,21 +1,29 @@
 const http = require('http');
+const url = require('url');
+
+var items = [];
 
 const server = http.createServer(function (req, res) {
-    // const body = 'Hello, World!';
-    //
-    // res.setHeader('Content-Length', body.length);
-    // res.setHeader('Content-Type', 'text/plain');
-    // res.end(body);
+    switch (req.method) {
+        case 'POST':
+            var item = '';
+            req.setEncoding('utf8');
+            req.on('data', function (chunk) {
+                item += chunk;
+            });
 
-    const url = 'http://google.com';
-    const body = '<p>Redirecting to <a href="' + url + '">'
-        + url + '</a></p>';
-
-    res.setHeader('Location', url);
-    res.setHeader('Content-Length', body.length);
-    res.setHeader('Content-Type', 'text/html');
-    res.statusCode = 302;
-    res.end(body);
+            req.on('end',function () {
+                items.push(item);
+                res.end('Ok\n');
+            });
+            break;
+        case 'GET':
+            items.forEach(function (item, i) {
+                res.write(i + ')' + item + '\n');
+            });
+            res.end();
+            break;
+    }
 });
 
 server.listen(3000);
