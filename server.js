@@ -1,32 +1,34 @@
-// setTimeout(function () {
-//     console.log('I execute first.');
-//     setTimeout(function () {
-//         console.log('I execute next.');
-//         setTimeout(function () {
-//             console.log('I execute last');
-//         }, 100);
-//     }, 500);
-// }, 1000);
-
 const flow = require('nimble');
+const exec = require('child_process').exec;
+
+function downloadNodeVersion(version, destination, callback) {
+    const url = 'http://nodejs.org/dist/node-v' + version + '.tag.gz';
+    const filepath = destination + '/' + version + '.tgz';
+    exec('curl ' + url + '>' + filepath, callback);
+}
 
 flow.series([
     function (callback) {
-        setTimeout(function () {
-            console.log('I execute first');
-            callback();
-        }, 1000);
+        flow.parallel([
+            function (callback) {
+                console.log('Downloading Node v0.4.6...');
+                downloadNodeVersion('0.4.6', '/tmp', callback);
+            },
+            function (callback) {
+                console.log('Downloading Node v0.4.7...');
+                downloadNodeVersion('0.4.7', '/tmp', callback);
+            }
+        ], callback);
     },
     function (callback) {
-        setTimeout(function () {
-            console.log('I execute next');
-            callback();
-        }, 500);
-    },
-    function (callback) {
-        setTimeout(function () {
-            console.log('I execute last');
-            callback();
-        }, 100);
+        console.log('Creating archive of downloaded files...');
+
+        exec(
+            'tar cvf node_distros.tar /tmp/0.4.6.tgz /tmp/0.4.7.tgz',
+            function (err, stdout, stderr) {
+                console.log('All Done!');
+                callback();
+            }
+        );
     }
 ]);
