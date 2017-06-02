@@ -13,18 +13,11 @@ const server = http.createServer(function (req, res) {
     console.log(path);
 
     const stream = fs.createReadStream(path);
+    stream.pipe(res);
 
-    stream.on('data', function (chunk) {
-        res.write(chunk);
-    });
-
-    stream.on('end', function () {
-        res.end();
-    });
-    
     stream.on('error', function (error) {
         console.log(error);
-    })
+    });
 });
 
 server.listen(3000);
