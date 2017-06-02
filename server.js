@@ -3,21 +3,12 @@ const parse = require('url').parse;
 const join = require('path').join;
 const fs = require('fs');
 
-var root = __dirname;
-console.log(root);
-
 const server = http.createServer(function (req, res) {
-    const url = parse(req.url);
-    const path = join(root, url.pathname);
+    req.setEncoding('utf-8');
 
-    console.log(path);
-
-    const stream = fs.createReadStream(path);
-    stream.pipe(res);
-
-    stream.on('error', function (error) {
-        console.log(error);
-    });
+    const writeStream = fs.createWriteStream('./req.txt');
+    req.pipe(writeStream);
+    res.end();
 });
 
 server.listen(3000);
