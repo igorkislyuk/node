@@ -3,27 +3,55 @@ const parse = require('url').parse;
 const join = require('path').join;
 const fs = require('fs');
 const qs = require('querystring');
+const formidable = require('formidable');
 
 var items = [];
 
-function show(res) {
-    const html = '<html><head><title>Todo List</title></head>' +
+function show(req, res) {
+    const html = '<html>' +
+        '<head><title>Todo List</title></head>' +
         '<body>' +
-        '<h1>Todo List</h1>' +
-        '<ul>' +
-            items.map(function (item) {
-                return '<li>' +  item + '</li>'
-            }).join('') +
-        '</ul>' +
-        '<form method="post" action="/">' +
-        '<p><input type="text" name="item"/></p>' +
-        '<p><input type="submit" value="Add Item" /></p>' +
+        '<form method="post" action="/" enctype="multipart/form-data">' +
+        '<p><input type="text" name="name"/></p>' +
+        '<p><input type="file" name="file"/></p>' +
+        '<p><input type="submit" value="Upload" /></p>' +
         '</form>' +
         '</body>' +
         '</html>';
     res.setHeader('Content-Length', Buffer.byteLength(html));
     res.setHeader('Content-Type', 'text/html');
     res.end(html);
+}
+
+function upload(req, res) {
+    if (!isFormData(req)) {
+        res.statusCode = 400;
+        res.end('Bad request: expecting multipart/form-data');
+        return;
+    }
+
+    const form = new formidable.IncomingForm();
+
+    form.on('field', function (field, name) {
+        console.log(field);
+        console.log(name);
+    });
+
+    form.on('file', function (name, file) {
+        console.log(name);
+        console.log(file);
+    });
+
+    form.on('end', function () {
+        res.end('upload complete');
+    });
+
+    form.parse(req);
+}
+
+function isFormData(req) {
+    const type = req.headers['content-type'] || '';
+    return 0 == type.indexOf('multipart/form-data');
 }
 
 function notFound(res) {
@@ -38,28 +66,14 @@ function badRequest(res) {
     res.end('Bad Request');
 }
 
-function add(req, res) {
-    var body = '';
-
-    req.setEncoding('utf-8');
-    req.on('data', function (chunk) {
-        body += chunk;
-    });
-    req.on('end', function () {
-        const obj = qs.parse(body);
-        items.push(obj.item);
-        show(res);
-    });
-}
-
 const server = http.createServer(function (req, res) {
     if ('/' == req.url) {
         switch (req.method) {
             case'GET':
-                show(res);
+                show(req, res);
                 break;
             case'POST':
-                add(req, res);
+                upload(req, res);
                 break;
             default:
                 badRequest(res);

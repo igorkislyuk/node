@@ -4,7 +4,8 @@
   "description": "Example Node.js project",
   "dependencies": {
     "mime": "~1.2.7",
-    "nimble": "^0.0.2"
+    "nimble": "^0.0.2",
+    "formidable": "^1.1.1"
   },
   "repository": "https://github.com/igorkislyuk/node",
   "license": "MIT"
