@@ -1,12 +1,12 @@
+const http = require('http');
 const https = require('https');
 const fs = require('fs');
 
-const options = {
-    key: fs.readFileSync('./key.pem'),
-    cert: fs.readFileSync('./key-cert.pem')
-};
+var counter = 0;
 
-https.createServer(options, function (req, res) {
-    res.writeHead(200);
-    res.end('Hello world!\n');
-}).listen(3000);
+const server = http.createServer(function (req, res) {
+    counter++;
+    res.end('I have been accessed '+ counter + ' times.');
+});
+
+server.listen(3000);
