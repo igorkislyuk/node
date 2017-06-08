@@ -6,15 +6,15 @@ const server = http.createServer(function (req, res) {
         case 'POST':
             switch (req.url) {
                 case '/':
-                    work.add(db, req, res);
+                    work.add(req, res);
                     break;
 
                 case '/archive':
-                    work.archive(db, req, res);
+                    work.archive(req, res);
                     break;
 
                 case '/delete':
-                    work.delete(db, req, res);
+                    work.delete(req, res);
                     break;
             }
             break;
@@ -26,7 +26,7 @@ const server = http.createServer(function (req, res) {
                     break;
 
                 case '/archived':
-                    work.showArchived(db, res);
+                    work.showArchived(res);
             }
             break;
     }
