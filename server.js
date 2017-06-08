@@ -1,74 +1,44 @@
 const http = require('http');
-const https = require('https');
-const fs = require('fs');
-const path = require('path');
+const work = require('./lib/timetrack');
 
-const args = process.argv.splice(2);
-const command = args.shift();
-const taskDescription = args.join('');
+const server = http.createServer(function (req, res) {
+    switch (req.method) {
+        case 'POST':
+            switch (req.url) {
+                case '/':
+                    work.add(db, req, res);
+                    break;
 
-const file = path.join(process.cwd(), './tasks');
+                case '/archive':
+                    work.archive(db, req, res);
+                    break;
 
-switch (command) {
-    case 'list':
-        listTasks(file);
-        break;
+                case '/delete':
+                    work.delete(db, req, res);
+                    break;
+            }
+            break;
 
-    case 'add':
-        addTask(file, taskDescription);
-        break;
+        case 'GET':
+            switch (req.url) {
+                case '/':
+                    work.show(res);
+                    break;
 
-    default:
-        console.log('Usage: ' + process.argv[0] + 'list|add [taskDescription]');
-}
+                case '/archived':
+                    work.showArchived(db, res);
+            }
+            break;
+    }
+});
 
-function loadOrInitializeTaskArray(file, callback) {
-    fs.exists(file, function (exists) {
-        var tasks = [];
-        if (exists) {
-            fs.readFile(file, 'utf8', function (err, data) {
-                if (err) {
-                    throw err;
-                }
-
-                const stringData = data.toString();
-                const tasks = JSON.parse(stringData || '[]');
-                callback(tasks);
-            });
-        } else {
-            callback([]);
-        }
+work.database
+    .authenticate()
+    .then(() => {
+        console.log('Connection has been established successfully.');
+        work.createModel();
+        server.listen(3000);
+    })
+    .catch(err => {
+        console.error('Unable to connect to the database:', err);
     });
-}
-
-function listTasks(file) {
-    loadOrInitializeTaskArray(file, function (tasks) {
-        for (var index in tasks) {
-            console.log(tasks[index]);
-        }
-    });
-}
-
-function storeTasks(file, tasks) {
-    fs.writeFile(file, JSON.stringify(tasks), 'utf8', function (err) {
-        if (err) {
-            throw err;
-        }
-
-        console.log('Saved.');
-    });
-}
-
-function addTask(file, taskDescription) {
-    loadOrInitializeTaskArray(file, function (tasks) {
-        tasks.push(taskDescription);
-        storeTasks(file, tasks);
-    });
-}
-
-
-
-
-
-
-
