@@ -29,10 +29,33 @@ const Task = mongoose.model('Task');
 // });
 
 
-Task.find({'project': 'Bikeshed'}, function (err, tasks) {
-    for (var i = 0; i < tasks.length; i++) {
-        console.log('ID: ' + tasks[i]._id);
-        console.log(tasks[0].description);
+function displayElements() {
+    Task.find({'project': 'Bikeshed'}, function (err, tasks) {
+        for (var i = 0; i < tasks.length; i++) {
+            console.log('\nID: ' + tasks[i]._id);
+            console.log(tasks[0].description);
+        }
+    });
+}
+
+displayElements();
+
+Task.findById('59405f83d062ce5eff017688', function (err, task) {
+    if (err) {
+        throw err;
+    }
+
+    task.description = 'Paint the bikeshed green.';
+
+    task.save(function (err, task) {
+        console.log('New description is: ' + task.description);
+        displayElements();
+    });
+});
+
+Task.findById('59405f8ef266775f039f0f66', function (err, task) {
+    if (task !== null) {
+        task.remove();
     }
 });
 
