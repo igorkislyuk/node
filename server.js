@@ -1,44 +1,40 @@
 const http = require('http');
-const work = require('./lib/timetrack');
 
-const server = http.createServer(function (req, res) {
-    switch (req.method) {
-        case 'POST':
-            switch (req.url) {
-                case '/':
-                    work.add(req, res);
-                    break;
+const mongodb = require('mongodb');
+const server = new mongodb.Server('127.0.0.1', 27017, {});
 
-                case '/archive':
-                    work.archive(req, res);
-                    break;
+const client = new mongodb.Db('mydatabase', server, {w: 1});
 
-                case '/delete':
-                    work.delete(req, res);
-                    break;
-            }
-            break;
-
-        case 'GET':
-            switch (req.url) {
-                case '/':
-                    work.show(res);
-                    break;
-
-                case '/archived':
-                    work.showArchived(res);
-            }
-            break;
+client.open(function (err) {
+    if (err) {
+        throw err;
     }
-});
 
-work.database
-    .authenticate()
-    .then(() => {
-        console.log('Connection has been established successfully.');
-        work.createModel();
-        server.listen(3000);
-    })
-    .catch(err => {
-        console.error('Unable to connect to the database:', err);
+    client.collection('test_insert', function (err, collection) {
+        if (err) {
+            throw err;
+        }
+
+        console.log('We are now able to perform changes.');
+
+
+        collection.insert(
+            {
+                "title": "I like cake",
+                "body": "It is quite good."
+            },
+            {safe: true},
+            function (err, documents) {
+                if (err) {
+                    throw err;
+                }
+
+                console.log('Document ID is: ' + documents.insertedIds[0]);
+
+                client.close();
+            }
+        );
+
+
     });
+});
