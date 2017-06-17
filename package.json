@@ -4,6 +4,8 @@
   "description": "Example Node.js project",
   "dependencies": {
     "connect": "^3.6.2",
+    "connect-error": "^1.0.0",
+    "cookie-parser": "^1.4.3",
     "formidable": "^1.1.1",
     "mime": "~1.2.7",
     "mongodb": "^2.2.28",
