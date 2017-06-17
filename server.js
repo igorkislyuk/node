@@ -1,22 +1,25 @@
 const connect = require('connect');
-const connectError = require('connect-error');
-const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const formidable = require('formidable');
 
 const port = 3000;
-const secret = 'tobi is a cool ferret';
 
-connect()
-    .use(cookieParser(secret))
+const app = connect()
+    .use(bodyParser.json())
+    .use(bodyParser.urlencoded())
     .use(function (req, res) {
-        res.setHeader('Set-Cookie', 'foo=bar');
-        res.setHeader('Set-Cookie', 'tobi=ferret; Expires=Tue, 08 Jun 2021 10:18:14 GMT');
-        res.end();
 
+        const form = formidable.IncomingForm();
 
-        // console.log(req.cookies);
-        // console.log(req.signedCookies);
-        // res.end('hello\n');
-    })
-    .listen(port);
+        form.parse(req, function (err, fields, files) {
+            console.log(files);
+            console.log(fields);
+
+            res.end('Thanks!');
+        });
+
+    });
+
+app.listen(port);
 
 
