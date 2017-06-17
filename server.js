@@ -1,23 +1,29 @@
 const connect = require('connect');
 
-const port = 3000;
+function errorHandler() {
+    const env = process.env.NODE_ENV || 'development';
 
-function hello(req, res) {
-    if (!res.headersSent) {
-        res.setHeader('Content-Type', 'text/plain');
-    } else {
-        console.log('Already sent!');
+    return function (err, req, res, _) {
+
+        res.statusCode = 500;
+        switch (env) {
+            case 'development':
+
+                res.setHeader('Content-Type', 'text/plain');
+                res.end(err.toString());
+                break;
+
+            default:
+                res.end('Server error');
+        }
     }
-
-    res.end('Hello world!\n');
 }
 
-const logger = require('./middleware/logger');
-const rewrite = require('./middleware/rewrite');
-
 connect()
-    .use(logger(':method:url'))
-    .use(rewrite)
-    .use(logger(':method:url'))
-    .use(hello)
-    .listen(port);
+    .use(function hello(req, res) {
+        foo();
+        res.setHeader('Content-Type', 'text/plain');
+        res.end('Hello, world!');
+    })
+    .use(errorHandler())
+    .listen(3000);
