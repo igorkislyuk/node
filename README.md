@@ -1,1 +1,1 @@
-# Node example project
+# Node learning project

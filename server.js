@@ -1,4 +1,5 @@
 const connect = require('connect');
+
 const port = 3000;
 
 function hello(req, res) {
@@ -11,27 +12,12 @@ function hello(req, res) {
     res.end('Hello world!\n');
 }
 
-const logger = require('./logger.js');
-
-const router = require('./middleware/router');
-
-const routes = {
-    GET: {
-        '/users': function (req, res) {
-            res.end('tobi, loki, ferret');
-        },
-        '/users/:id': function (req, res, id) {
-            res.end('user ' + id);
-        }
-    },
-    DELETE: {
-        '/user/:id': function (req, res, id) {
-            res.end('deleted user ' + id);
-        }
-    }
-};
+const logger = require('./middleware/logger');
+const rewrite = require('./middleware/rewrite');
 
 connect()
     .use(logger(':method:url'))
-    .use(router(routes))
-    .listen(3000);
+    .use(rewrite)
+    .use(logger(':method:url'))
+    .use(hello)
+    .listen(port);
