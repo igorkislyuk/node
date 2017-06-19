@@ -5,7 +5,7 @@ const req = http.request({
     method: 'POST',
     port: 3000,
     headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/x-www-form-urlencoded'
     }
 }, function (res) {
     console.log(res.statusCode);
@@ -17,7 +17,7 @@ req.on('error', function (err) {
 
 req.write('[');
 
-let n = 300000;
+let n = 1000;
 while (n--) {
     req.write('"foo",');
 }
