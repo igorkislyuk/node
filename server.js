@@ -1,31 +1,29 @@
 const http = require('http');
 const connect = require('connect');
-const vhost = require('vhost');
 const url = require('url');
+const cookieSession = require('cookie-session');
 
 const port = 3000;
 
-// DO NOT forget to create entries in /etc/hosts/
+connect()
+    .use(cookieSession({
+        name: 'session',
+        keys: ['secret'],
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }))
+    .use(function (req, res) {
+        console.log(req.session);
+        if (req.session.cart) {
+            if (req.session.cart.items.length >= 5) {
+                req.session = null;
+            } else {
+                req.session.cart.items.push(req.session.cart.items.length + 1);
+            }
+        } else {
+            req.session.cart = {items: [1, 2, 3]};
+        }
+        res.end();
+    })
+    .listen(port);
 
-// create main app
-const app = connect();
 
-app.use(vhost('mail.example.com', function (req, res) {
-    // handle req + res belonging to mail.example.com
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('hello from mail!');
-}));
-
-// an external api server in any framework
-const httpServer = http.createServer(function (req, res) {
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('hello from the api!');
-});
-
-app.use(vhost('api.example.com', function (req, res) {
-    // handle req + res belonging to api.example.com
-    // pass the request to a standard Node.js HTTP server
-    httpServer.emit('request', req, res)
-}));
-
-app.listen(port);

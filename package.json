@@ -8,6 +8,7 @@
     "connect-error": "^1.0.0",
     "content-type": "^1.0.2",
     "cookie-parser": "^1.4.3",
+    "cookie-session": "^2.0.0-beta.2",
     "express": "^4.15.3",
     "formidable": "^1.1.1",
     "iconv-lite": "^0.4.18",
