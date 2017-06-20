@@ -1,26 +1,18 @@
 const connect = require('connect');
-const getRawBody = require('raw-body');
-const contentType = require('content-type');
 const qs = require('qs');
 const url = require('url');
 
 const port = 3000;
 
-const express = require('express');
+connect()
+    .use(function (req, res, next) {
+        req.query = qs.parse(url.parse(req.url).query);
+        console.log(req.query);
 
-// express()
-//     .use(function (req, res) {
-//         res.setHeader('Content-Type', 'application/json');
-//         console.log(req.query);
-//         res.end('done');
-//     })
-
-const app = express();
-
-app.get('/', function(req, res){
-    // res.send('id: ' + req.query.id);
-    console.log(req.query);
-    res.end();
-});
-
-app.listen(port);
+        next();
+    })
+    .use(function (req, res) {
+        res.setHeader('Content-Type', 'application/json');
+        res.end();
+    })
+    .listen(port);
