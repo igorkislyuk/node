@@ -9,20 +9,13 @@ connect()
     .use(cookieSession({
         name: 'session',
         keys: ['secret'],
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        maxAge: 5000 // 24 hours
     }))
     .use(function (req, res) {
-        console.log(req.session);
-        if (req.session.cart) {
-            if (req.session.cart.items.length >= 5) {
-                req.session = null;
-            } else {
-                req.session.cart.items.push(req.session.cart.items.length + 1);
-            }
-        } else {
-            req.session.cart = {items: [1, 2, 3]};
-        }
-        res.end();
+        req.session.views = (req.session.views || 0) + 1;
+
+        // Write response
+        res.end(req.session.views + ' views')
     })
     .listen(port);
 
