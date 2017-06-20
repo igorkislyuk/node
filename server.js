@@ -1,16 +1,18 @@
-const basicAuth = require('connect-basic-auth');
-const express = require('express');
+const connect = require('connect');
+const cookieSession = require('cookie-session');
+const errorHandler = require('errorhandler');
 
-const app = express();
-app.use(basicAuth(function(credentials, req, res, next) {
-    next();
+connect()
+    .use(cookieSession({
+        name: 'session',
+        keys: ['secret'],
+        maxAge: 24 * 60 * 60 * 1000
+    }))
+    .use(function (req, res) {
+        console.log(req.session);
 
-
-}, 'Please enter your credentials.'));
-
-//Lets require authentication for the rest of our routes.
-app.all('*', function(req, res, next) {
-    req.requireAuthorization(req, res, next);
-});
-
-app.listen(3000);
+        asd();
+        res.end();
+    })
+    .use(errorHandler())
+    .listen(3000);
