@@ -1,33 +1,31 @@
+const http = require('http');
 const connect = require('connect');
-const morgan = require('morgan');
-const bodyParser = require('body-parser');
-const methodOverride = require('method-override');
+const vhost = require('vhost');
+const url = require('url');
 
 const port = 3000;
 
-function edit(req, res, next) {
-    if ('GET' !== req.method) {
-        return next();
-    }
+// DO NOT forget to create entries in /etc/hosts/
 
-    res.setHeader('Content-Type', 'text/html');
-    res.write('<form method="POST" action="/resource?_method=DELETE">' +
-        '<button type="submit">Delete resource</button>' +
-        '</form>');
-    res.end();
-}
+// create main app
+const app = connect();
 
-function deleteResource(req, res, next) {
-    if ('DELETE' !== req.method) {
-        return next();
-    }
+app.use(vhost('mail.example.com', function (req, res) {
+    // handle req + res belonging to mail.example.com
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('hello from mail!');
+}));
 
-    res.end('Resource deleted.');
-}
+// an external api server in any framework
+const httpServer = http.createServer(function (req, res) {
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('hello from the api!');
+});
 
-connect()
-    .use(bodyParser.urlencoded())
-    .use(methodOverride('_method'))
-    .use(edit)
-    .use(deleteResource)
-    .listen(port);
+app.use(vhost('api.example.com', function (req, res) {
+    // handle req + res belonging to api.example.com
+    // pass the request to a standard Node.js HTTP server
+    httpServer.emit('request', req, res)
+}));
+
+app.listen(port);
