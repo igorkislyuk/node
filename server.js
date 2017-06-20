@@ -1,50 +1,26 @@
 const connect = require('connect');
-const bodyParser = require('body-parser');
 const getRawBody = require('raw-body');
 const contentType = require('content-type');
+const qs = require('qs');
+const url = require('url');
 
 const port = 3000;
 
-function limit(limitConditions, req, next) {
+const express = require('express');
 
-    for (let limitCondition of limitConditions) {
-        if (limitCondition.type !== req.headers['content-type']) {
-            continue;
-        }
+// express()
+//     .use(function (req, res) {
+//         res.setHeader('Content-Type', 'application/json');
+//         console.log(req.query);
+//         res.end('done');
+//     })
 
-        getRawBody(req, {
-            length: req.headers['content-length'],
-            limit: limitCondition.limit,
-            encoding: contentType.parse(req).parameters.charset
-        }, function (err, string) {
-            if (err) {
-                next(err);
-            }
+const app = express();
 
-            req.text = string;
-            next();
-        });
-    }
-}
+app.get('/', function(req, res){
+    // res.send('id: ' + req.query.id);
+    console.log(req.query);
+    res.end();
+});
 
-connect()
-    .use(function (req, res, next) {
-        const limitations = [
-            {type: 'application/json', limit: '32kb'},
-            {type: 'application/x-www-form-urlencoded', limit: '2kb'}
-        ];
-
-        limit(limitations, req, next);
-    })
-    .use(function (err, req, res, _) {
-        if (err) {
-            res.statusCode = 303;
-            res.end('error');
-        }
-        // if no error simply drop to next handler...
-    })
-    .use(function (req, res) {
-        res.statusCode = 200;
-        res.end('Simple handler working fine.');
-    })
-    .listen(port);
+app.listen(port);
