@@ -1,23 +1,33 @@
 const connect = require('connect');
-const qs = require('qs');
-const url = require('url');
 const morgan = require('morgan');
-const fs = require('fs');
+const bodyParser = require('body-parser');
+const methodOverride = require('method-override');
 
 const port = 3000;
 
-const logStream = fs.createWriteStream('test_log.log');
+function edit(req, res, next) {
+    if ('GET' !== req.method) {
+        return next();
+    }
+
+    res.setHeader('Content-Type', 'text/html');
+    res.write('<form method="POST" action="/resource?_method=DELETE">' +
+        '<button type="submit">Delete resource</button>' +
+        '</form>');
+    res.end();
+}
+
+function deleteResource(req, res, next) {
+    if ('DELETE' !== req.method) {
+        return next();
+    }
+
+    res.end('Resource deleted.');
+}
 
 connect()
-    .use(morgan(':method :url :status :res[content-length] - :response-time ms', {stream: logStream}))
-    .use(function (req, res, next) {
-        req.query = qs.parse(url.parse(req.url).query);
-        console.log(req.query);
-
-        next();
-    })
-    .use(function (req, res) {
-        res.setHeader('Content-Type', 'application/json');
-        res.end();
-    })
+    .use(bodyParser.urlencoded())
+    .use(methodOverride('_method'))
+    .use(edit)
+    .use(deleteResource)
     .listen(port);
