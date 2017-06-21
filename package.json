@@ -4,6 +4,7 @@
   "description": "Example Node.js project",
   "dependencies": {
     "body-parser": "^1.17.2",
+    "compression": "^1.6.2",
     "connect": "^3.6.2",
     "connect-basic-auth": "^0.1.0",
     "connect-error": "^1.0.0",
