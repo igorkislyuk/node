@@ -10,6 +10,7 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const errorHandler = require('errorhandler');
 
 // params
 const key = fs.readFileSync('./support/key.pem');
@@ -25,7 +26,6 @@ const credentials = {
 const photos = require('./routes/photos');
 
 const app = express();
-
 const env = process.env.NODE_ENV || 'development';
 
 app.set('photos', __dirname + '/public/photos');
@@ -36,11 +36,8 @@ app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(cookieParser());
+// app.use(bodyParser.urlencoded({extended: false}));
 
-// another way of static
-// app.use('/public', serveStatic(publicPath));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', photos);
@@ -62,5 +59,7 @@ app.use(function (err, req, res) {
     res.status(err.status || 500);
     res.render('error');
 });
+
+app.use(errorHandler);
 
 https.createServer(credentials, app).listen(3000);
