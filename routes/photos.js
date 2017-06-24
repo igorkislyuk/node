@@ -5,19 +5,11 @@ const path = require('path');
 const fs = require('fs');
 const formidable = require('formidable');
 
-// let photos = [];
-//
-// photos.push({
-//     name: 'Node.js Logo',
-//     path: 'https://nodejs.org/images/logos/nodejs-green.png'
-// });
-//
-// photos.push({
-//     name: 'Ryan Speaking',
-//     path: 'https://nodejs.org/images/ryan-speaker.jpg'
-// });
-
 function home(res) {
+    // Photo.remove({}, function(err) {
+    //     console.log('collection removed');
+    // });
+
     Photo.find({}, function (err, photos) {
         if (err) {
             throw err;
@@ -34,12 +26,13 @@ function save(req, res) {
 
     // can't use combined form values - not `formidable` not `multiparty`
     form.parse(req, function (err, fields, files) {
+
         const photoName = fields.photoName;
         const image = files.photoImage;
         const name = photoName || image.name;
 
         const photosDir = req.app.get('photos');
-        const newImagePath = path.join(photosDir, name);
+        const newImagePath = path.join(photosDir, image.name);
 
         fs.rename(image.path, newImagePath, function (err) {
             if (err) {
@@ -48,7 +41,7 @@ function save(req, res) {
 
             Photo.create({
                 name: name,
-                path: newImagePath
+                path: image.name
             }, function (err) {
                 if (err) {
                     throw err;
