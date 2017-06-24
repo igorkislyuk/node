@@ -76,7 +76,7 @@ router.get('/photo/:id/download', function (req, res) {
         }
         const filePath = path.join(req.app.get('photos'), photo.path);
 
-        res.sendFile(filePath);
+        res.download(filePath, 'Your Photo.jpg');
     })
 });
 
