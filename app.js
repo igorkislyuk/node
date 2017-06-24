@@ -1,4 +1,8 @@
-// "use strict";
+"use strict";
+
+// modules
+const https = require('https');
+const fs = require('fs');
 
 const express = require('express');
 const path = require('path');
@@ -7,40 +11,46 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const errorHandler = require('errorhandler');
+const router = express.Router();
 
+// params
+const key = fs.readFileSync('./support/key.pem');
+const certificate = fs.readFileSync('./support/cert.pem');
+
+const credentials = {
+    key: key,
+    cert: certificate,
+    passphrase: 'test'
+};
+
+// routes
 const index = require('./routes/index');
 const photos = require('./routes/photos');
 
-const app = express();
-
-// const router = express.Router();
-
-// view engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'ejs');
-
-// const env = process.env.NODE_ENV || 'development';
 //
-// if ('development' === env) {
-//     app.use(errorHandler);
-//     app.set('photos', __dirname + '/public/photos');
-// } else if ('production' === env) {
-//     app.set('photos', __dirname + '/public/production/photos');
-// }
+const app = express();
+const env = process.env.NODE_ENV || 'development';
 
-// app.use(logger('dev'));
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({extended: false}));
-// app.use(cookieParser());
-// app.use(express.static(path.join(__dirname, 'public')));
+// configuration
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
-app.route('/test')
-    .get(function (req, res) {
-        res.send('Test page');
-    });
+if ('development' === env) {
+    app.use(errorHandler);
+    app.set('photos', __dirname + '/public/photos');
+} else if ('production' === env) {
+    app.set('photos', __dirname + '/public/production/photos');
+}
 
-// router.get('/', function (req, res) {
-//     res.send('test');
-// });
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.listen(3000);
+// main
+app.use('/', index);
+// app.use('/', photos);
+
+const httpsServer = https.createServer(credentials, app);
+httpsServer.listen(3000);
