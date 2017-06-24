@@ -67,4 +67,17 @@ router.post('/upload', function (req, res) {
     save(req, res);
 });
 
+router.get('/photo/:id/download', function (req, res) {
+    const id = req.params.id;
+
+    Photo.findById(id, function (err, photo) {
+        if (err) {
+            throw err;
+        }
+        const filePath = path.join(req.app.get('photos'), photo.path);
+
+        res.sendFile(filePath);
+    })
+});
+
 module.exports = router;
