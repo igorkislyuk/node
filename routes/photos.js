@@ -13,15 +13,11 @@ photos.push({
     path: 'https://nodejs.org/images/ryan-speaker.jpg'
 });
 
-// exports.list = function (req, res) {
-//     res.render('photos', {
-//         title: 'Photos',
-//         photos: photos
-//     });
-// };
-
 router.get('/', function (req, res) {
-    res.render('index', {title: 'Test'});
+    res.render('photos', {
+        title: 'Photos',
+        photos: photos
+    });
 });
 
 module.exports = router;
