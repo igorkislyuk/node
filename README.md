@@ -1,1 +1,1 @@
-# Photo
+# Node.JS test project
