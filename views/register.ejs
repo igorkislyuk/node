@@ -5,6 +5,7 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
 </head>
 <body>
+
 <% include menu %>
 
 <h1><%= title %></h1>
@@ -14,10 +15,10 @@
 
 <form action='/register' method='post'>
     <p>
-        <input type='text' name='user[name]' placeholder='Username' />
+        <input type='text' name='userName' placeholder='Username' />
     </p>
     <p>
-        <input type='password' name='user[pass]' placeholder='Password' />
+        <input type='password' name='userPass' placeholder='Password' />
     </p>
     <p>
         <input type='submit' value='Sign Up' />
