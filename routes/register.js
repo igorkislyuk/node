@@ -3,7 +3,6 @@ const router = express.Router();
 const User = require('../lib/User');
 
 router.get('/', function (req, res) {
-    res.message('test message', 'info');
     res.render('register', { title: 'Register'});
 });
 
