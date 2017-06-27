@@ -10,7 +10,12 @@ exports.form = function (req, res) {
 };
 
 exports.submit = function (req, res, next) {
-    const data = qs.parse(req.body);
+    const data = qs.parse(req.body).user;
+
+    if (!data.name) {
+        res.send('No name!');
+        return;
+    }
 
     User.authenticate(data.name, data.pass, function (err, user) {
         if (err) {
