@@ -6,12 +6,6 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 
-// from lib
-const messages = require('./lib/messages');
-
-const index = require('./routes/index');
-const register = require('./routes/register');
-
 const app = express();
 
 // view engine setup
@@ -19,8 +13,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -28,10 +22,26 @@ app.set('trust proxy', 1);
 app.use(session({
     secret: 'keyboard cat'
 }));
+
+// application configuration level
+const messages = require('./lib/messages');
+
+const index = require('./routes/index');
+const register = require('./routes/register');
+const login = require('./routes/login');
+
 app.use(messages);
+
+// custom routes
 
 app.use('/', index);
 app.use('/register', register);
+
+app.get('/login', login.form);
+app.post('/login', login.submit);
+app.get('/logout', login.logout);
+
+// error handling
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
