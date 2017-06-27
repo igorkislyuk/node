@@ -30,6 +30,9 @@ const index = require('./routes/index');
 const register = require('./routes/register');
 const login = require('./routes/login');
 
+const user = require('./lib/middleware/user');
+
+app.use(user);
 app.use(messages);
 
 // custom routes
