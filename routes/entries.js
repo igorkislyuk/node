@@ -8,7 +8,7 @@ const Entry = require('../lib/entry');
 
 module.exports = router;
 
-router.get('/', page(Entry.count, 5), function (req, res, next) {
+router.get('/:page?', page(Entry.count, 5), function (req, res, next) {
     const page = req.page;
     Entry.getRange(page.from, page.to, function (err, entries) {
         if (err) {
