@@ -32,7 +32,7 @@ router.post('/', function (req, res, next) {
                 }
 
                 req.session.id = user.id;
-                res.redirect('/');
+                res.redirect('/login');
             });
         }
     });
