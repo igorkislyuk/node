@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const Entry = require('../lib/entry');
 const qs = require('qs');
 const validate = require('../lib/middleware/validate');
+const page = require('../lib/middleware/page');
+
+const Entry = require('../lib/entry');
 
 module.exports = router;
 
-router.get('/', function (req, res, next) {
-    Entry.getRange(0, -1, function (err, entries) {
+router.get('/', page(Entry.count, 5), function (req, res, next) {
+    const page = req.page;
+    Entry.getRange(page.from, page.to, function (err, entries) {
         if (err) {
             return next(err);
         }
