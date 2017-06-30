@@ -26,7 +26,7 @@ app.use(session({
 // application configuration level
 const messages = require('./lib/messages');
 
-const index = require('./routes/index');
+const entries = require('./routes/entries');
 const register = require('./routes/register');
 const login = require('./routes/login');
 
@@ -37,7 +37,7 @@ app.use(messages);
 
 // custom routes
 
-app.use('/', index);
+app.use('/', entries);
 app.use('/register', register);
 
 app.get('/login', login.form);
