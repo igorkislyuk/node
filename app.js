@@ -34,8 +34,7 @@ const api = require('./routes/api');
 
 const user = require('./lib/middleware/user');
 
-app.use('/api', api.auth);
-app.get('/api/user/:id', api.user);
+app.use('/api', api);
 
 app.use(user);
 app.use(messages);
