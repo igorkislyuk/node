@@ -10,6 +10,11 @@ module.exports = router;
 
 router.get('/:page?', page(Entry.count, 5), function (req, res, next) {
     const page = req.page;
+    if (isNaN(page.from) || isNaN(page.to)) {
+        next();
+        return;
+    }
+
     Entry.getRange(page.from, page.to, function (err, entries) {
         if (err) {
             return next(err);

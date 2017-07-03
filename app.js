@@ -30,7 +30,12 @@ const entries = require('./routes/entries');
 const register = require('./routes/register');
 const login = require('./routes/login');
 
+const api = require('./routes/api');
+
 const user = require('./lib/middleware/user');
+
+app.use('/api', api.auth);
+app.get('/api/user/:id', api.user);
 
 app.use(user);
 app.use(messages);
